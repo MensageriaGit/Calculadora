@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume e Ocupação no Carrinho</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 360px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #0096c7;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #023e8a;
+        }
+
+        #resultado {
+            margin-top: 15px;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        .barra-container {
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            height: 25px;
+            margin-top: 20px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .barra {
+            height: 100%;
+            background-color: #90ee90;
+            transition: width 0.8s ease, background-color 0.5s ease;
+        }
+
+        .barra-texto {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            text-align: center;
+            font-weight: bold;
+            color: #023e8a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comparar Volume (cm³)</h1>
+        <input type="number" id="comprimento" placeholder="Comprimento (cm)" min="0" step="any">
+        <input type="number" id="largura" placeholder="Largura (cm)" min="0" step="any">
+        <input type="number" id="altura" placeholder="Altura (cm)" min="0" step="any">
+        <button onclick="calcular()">Calcular e Visualizar</button>
+        <div id="resultado"></div>
+
+        <div class="barra-container">
+            <div class="barra" id="barra"></div>
+            <div class="barra-texto" id="barraTexto">0%</div>
+        </div>
+
+        <div class="info">Carrinho de referência: 140 L (140 000 cm³)</div>
+    </div>
+
+    <script>
+        function calcular() {
+            const comprimento = parseFloat(document.getElementById('comprimento').value);
+            const largura = parseFloat(document.getElementById('largura').value);
+            const altura = parseFloat(document.getElementById('altura').value);
+            const resultado = document.getElementById('resultado');
+            const barra = document.getElementById('barra');
+            const barraTexto = document.getElementById('barraTexto');
+
+            if (isNaN(comprimento) || isNaN(largura) || isNaN(altura) || comprimento <= 0 || largura <= 0 || altura <= 0) {
+                resultado.textContent = "Por favor, insira todos os valores corretamente.";
+                resultado.style.color = "#ffdddd";
+                barra.style.width = "0%";
+                barraTexto.textContent = "0%";
+                return;
+            }
+
+            const volumeUsuario = comprimento * largura * altura; // cm³
+            const volumeCarrinho = 140000; // 140 L
+            const porcentagem = (volumeUsuario / volumeCarrinho) * 100;
+            const volumeLitros = volumeUsuario / 1000; // conversão para L
+
+            let comparacao = "";
+            if (volumeUsuario > volumeCarrinho) {
+                comparacao = `🟥 O volume do seu objeto (${volumeLitros.toFixed(1)} L) ultrapassa o volume do carrinho!`;
+            } else if (volumeUsuario < volumeCarrinho) {
+                comparacao = `🟩 O volume do seu objeto (${volumeLitros.toFixed(1)} L) cabe no carrinho.`;
+            } else {
+                comparacao = `🟨 O volume é exatamente igual ao do carrinho (140 L)!`;
+            }
+
+            resultado.innerHTML = `
+                <p>📦 Volume do objeto: <strong>${volumeUsuario.toLocaleString("pt-BR")}</strong> cm³ (${volumeLitros.toFixed(2)} L)</p>
+            `;
+            resultado.style.color = "#fff";
+
+            // Atualiza a barra
+            let widthPercent = Math.min(porcentagem, 100);
+            barra.style.width = widthPercent + "%";
+
+            // COR: verde até 35%, vermelho acima disso
+            if (porcentagem > 35) {
+                barra.style.backgroundColor = "#ff4d4d"; // vermelho
+            } else {
+                barra.style.backgroundColor = "#90ee90"; // verde
+            }
+
+            barraTexto.textContent = porcentagem.toFixed(1) + "% ocupado";
+        }
+    </script>
+</body>
+</html>
